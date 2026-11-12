@@ -41,8 +41,8 @@ export function BrandMark({
         )}
       >
         <span className={cn("font-display leading-none tracking-tight", letters[size])}>
-          <span style={{ color: light ? "#c9848d" : "#7A1F2B" }}>M</span>
-          <span style={{ color: light ? "#fbf9f4" : "#1B2A49" }}>D</span>
+          <span className={light ? "text-[#c9848d]" : "text-burgundy"}>M</span>
+          <span className={light ? "text-cream" : "text-ink-soft"}>D</span>
         </span>
         <span
           aria-hidden

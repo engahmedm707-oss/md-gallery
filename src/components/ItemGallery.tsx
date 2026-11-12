@@ -38,8 +38,8 @@ export function ItemGallery({
         ) : (
           <div className="ornament absolute inset-0 flex items-center justify-center">
             <span className="font-display text-5xl tracking-tight text-ink/25">
-              <span style={{ color: "#7A1F2B" }}>M</span>
-              <span style={{ color: "#1B2A49" }}>D</span>
+              <span className="text-burgundy">M</span>
+              <span className="text-ink-soft">D</span>
             </span>
           </div>
         )}

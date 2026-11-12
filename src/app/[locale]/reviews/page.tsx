@@ -7,6 +7,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { Stars } from "@/components/Stars";
 import { ArrowIcon, CheckIcon } from "@/components/Icons";
 import { submitReview, submitReply } from "../actions";
+import { isUuid } from "@/lib/utils";
 
 function formatDate(value: string, locale: Locale) {
   return new Date(value).toLocaleDateString(locale === "ar" ? "ar-EG" : "en-GB", {
@@ -57,6 +58,9 @@ export default async function ReviewsPage({ params }: { params: Promise<{ locale
     (acc[rep.review_id] ||= []).push(rep);
     return acc;
   }, {});
+
+  // Demo catalogue entries have non-UUID ids and cannot be linked to reviews.
+  const reviewableItems = items.filter((it: any) => isUuid(String(it.id)));
 
   const average = reviews.length
     ? reviews.reduce((total, review) => total + Number(review.rating || 0), 0) / reviews.length
@@ -218,7 +222,7 @@ export default async function ReviewsPage({ params }: { params: Promise<{ locale
                     </label>
                     <select id="review-item" name="item_id" className="input">
                       <option value="">—</option>
-                      {items.map((it: any) => (
+                      {reviewableItems.map((it: any) => (
                         <option key={it.id} value={it.id}>
                           {locale === "ar" ? it.name_ar : it.name_en}
                         </option>

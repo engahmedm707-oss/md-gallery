@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireAdmin } from "@/lib/auth";
+import { imageExtension } from "@/lib/uploads";
 
 async function ensureAdmin() { await requireAdmin(); }
 
@@ -50,7 +51,8 @@ export async function deleteItem(id: string) {
   const { data: images } = await supabase.from("item_images").select("storage_path").eq("item_id", id);
   const paths = (images || []).map((i: any) => i.storage_path).filter((p: string) => p && !p.startsWith("http"));
   if (paths.length) {
-    await supabase.storage.from("item-images").remove(paths);
+    const admin = createAdminClient();
+    await admin.storage.from("item-images").remove(paths);
   }
   await supabase.from("item_images").delete().eq("item_id", id);
   const { error } = await supabase.from("items").delete().eq("id", id);
@@ -106,15 +108,33 @@ export async function upsertItem(formData: FormData) {
     itemId = data.id;
   }
 
-  // Image uploads (one or more)
+  // Image uploads (one or more). Storage writes use the service role after
+  // the admin check above, so they don't depend on storage RLS policies.
   const files = formData.getAll("images").filter((f): f is File => f instanceof File && f.size > 0);
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i];
-    const ext = file.name.split(".").pop() || "jpg";
-    const path = `${itemId}/${crypto.randomUUID()}.${ext}`;
-    const { error: upErr } = await supabase.storage.from("item-images").upload(path, file, { upsert: false });
-    if (upErr) throw new Error(upErr.message);
-    await supabase.from("item_images").insert({ item_id: itemId, storage_path: path, sort_order: i });
+  if (files.length) {
+    const admin = createAdminClient();
+    const uploaded: string[] = [];
+    try {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const ext = imageExtension(file);
+        const path = `${itemId}/${crypto.randomUUID()}.${ext}`;
+        const { error: upErr } = await admin.storage
+          .from("item-images")
+          .upload(path, file, { upsert: false, contentType: file.type });
+        if (upErr) throw new Error(upErr.message);
+        uploaded.push(path);
+        const { error: rowErr } = await supabase
+          .from("item_images")
+          .insert({ item_id: itemId, storage_path: path, sort_order: i });
+        if (rowErr) throw new Error(rowErr.message);
+      }
+    } catch (err) {
+      if (uploaded.length) await admin.storage.from("item-images").remove(uploaded);
+      // Never leave a half-created item without its images behind.
+      if (!id && itemId) await supabase.from("items").delete().eq("id", itemId);
+      throw err;
+    }
   }
 
   revalidatePath("/admin/items");

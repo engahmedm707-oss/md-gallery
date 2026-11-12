@@ -11,27 +11,19 @@
 In Supabase Dashboard → SQL Editor, run in order:
 1. `migrations/0001_init.sql`
 2. `migrations/0002_rls.sql`
-3. `seed.sql`
+3. `migrations/0003_storage.sql` (buckets + storage policies)
+4. `seed.sql`
 
 (Or use Supabase CLI: `supabase db push` if this folder is linked.)
 
 ## 3. Storage buckets & policies
-Create buckets in Storage:
-- `item-images` — for admin-uploaded product images. Recommended: **public bucket** (or public read policy) so catalog can display images.
-- `wall-images` — for customer wall uploads.
+`migrations/0003_storage.sql` creates the two public buckets and their policies:
+- `item-images` — admin-uploaded product images (10 MB limit; JPG/PNG/WebP/GIF/AVIF).
+- `wall-images` — customer wall uploads (same limits, own-folder writes).
 
-Apply Storage policies (Dashboard → Storage → Policies) as needed. Example guidance:
-- **item-images**: public read; admin (profiles.role='admin') insert/update/delete.
-- **wall-images**: public read for approved-post display paths (or serve via signed/public URLs per your choice); authenticated users insert to their own folder/prefix; admin manage.
-
-Because storage RLS uses `storage.objects`, a typical admin check policy is:
-```sql
--- example: allow admins full access to item-images
-create policy "item_images_admin_all" on storage.objects for all
-  using (bucket_id = 'item-images' and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'admin'))
-  with check (bucket_id = 'item-images' and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'admin'));
-```
-Adjust read policies to match public/private choices.
+The server actions upload with the service role after checking the admin role or
+purchase eligibility, so uploads work even before these policies are applied.
+The policies are still recommended as defence in depth for direct uploads.
 
 ## 4. Bootstrap the first admin
 After the first user signs up (or you create them in Auth → Users):

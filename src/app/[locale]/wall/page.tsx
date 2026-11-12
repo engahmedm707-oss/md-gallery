@@ -7,6 +7,7 @@ import { getPublicItems } from "@/lib/data";
 import { PageHeader } from "@/components/PageHeader";
 import { ArrowIcon, CheckIcon } from "@/components/Icons";
 import { submitEligibilityRequest, submitWallPost } from "../actions";
+import { isUuid } from "@/lib/utils";
 
 export default async function WallPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;
@@ -42,6 +43,9 @@ export default async function WallPage({ params }: { params: Promise<{ locale: s
   }
 
   const eligibleItems = items.filter((i: any) => eligibleItemIds.includes(i.id));
+  // Demo catalogue entries have non-UUID ids; never offer them in forms that
+  // write to the database.
+  const requestableItems = items.filter((i: any) => isUuid(String(i.id)));
   const steps =
     locale === "ar"
       ? [
@@ -176,6 +180,12 @@ export default async function WallPage({ params }: { params: Promise<{ locale: s
                     <ArrowIcon className="h-3.5 w-3.5" />
                   </Link>
                 </div>
+              ) : requestableItems.length === 0 ? (
+                <p className="mt-5 border-t border-line-soft pt-4 text-[12px] leading-6 text-muted">
+                  {locale === "ar"
+                    ? "لا توجد قطع متاحة لطلبات الأهلية حاليًا. أضف قطعة من لوحة الإدارة أولًا."
+                    : "No pieces are available for eligibility requests yet. Add a piece from the admin panel first."}
+                </p>
               ) : (
                 <form action={submitEligibilityRequest} className="mt-5 space-y-4">
                   <div>
@@ -184,7 +194,7 @@ export default async function WallPage({ params }: { params: Promise<{ locale: s
                     </label>
                     <select id="eligibility-item" name="item_id" className="input" required>
                       <option value="">{locale === "ar" ? "اختر القطعة" : "Select a piece"}</option>
-                      {items.map((it: any) => (
+                      {requestableItems.map((it: any) => (
                         <option key={it.id} value={it.id}>
                           {locale === "ar" ? it.name_ar : it.name_en}
                         </option>

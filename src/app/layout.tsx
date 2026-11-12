@@ -35,6 +35,11 @@ export const metadata: Metadata = {
   },
   description:
     "MD Gallery — a curated collection of paintings, handcrafted tables, crochet and decor. Prices in EGP, direct WhatsApp inquiries.",
+  other: {
+    // Keep the gallery's own palette intact — prevents Dark Reader from
+    // rewriting inline styles before React hydrates (false mismatches).
+    "darkreader-lock": "true",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -45,7 +50,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
-      <body className="min-h-full bg-paper text-ink">{children}</body>
+      <body className="min-h-full bg-paper text-ink" suppressHydrationWarning>
+        {children}
+      </body>
     </html>
   );
 }
