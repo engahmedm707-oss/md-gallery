@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1500" viewBox="0 0 1200 1500">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f6ddb2"/>
+      <stop offset="0.34" stop-color="#efb77a"/>
+      <stop offset="0.62" stop-color="#d17350"/>
+      <stop offset="0.82" stop-color="#9d3f36"/>
+      <stop offset="1" stop-color="#6d1e2a"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#fbe7b4" stop-opacity="0.95"/>
+      <stop offset="0.55" stop-color="#f7cf8a" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#f7cf8a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="ridge1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b04a3e"/>
+      <stop offset="1" stop-color="#7f2a2f"/>
+    </linearGradient>
+    <linearGradient id="ridge2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2b3d5c"/>
+      <stop offset="1" stop-color="#16233a"/>
+    </linearGradient>
+    <pattern id="grain" width="7" height="7" patternUnits="userSpaceOnUse">
+      <circle cx="1.4" cy="1.4" r="0.7" fill="#ffffff" opacity="0.055"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="1500" fill="url(#sky)"/>
+  <circle cx="760" cy="500" r="360" fill="url(#glow)"/>
+  <circle cx="760" cy="500" r="190" fill="#f8dda0"/>
+
+  <path d="M0 940 C 180 870 330 900 500 940 C 700 986 900 910 1200 860 L1200 1500 L0 1500 Z" fill="url(#ridge1)"/>
+  <path d="M0 1080 C 220 1010 380 1060 600 1100 C 820 1140 990 1060 1200 1030 L1200 1500 L0 1500 Z" fill="#5e1c28" opacity="0.85"/>
+  <path d="M0 1250 C 240 1180 460 1240 700 1270 C 900 1295 1060 1235 1200 1210 L1200 1500 L0 1500 Z" fill="url(#ridge2)"/>
+  <path d="M0 1365 C 250 1320 520 1368 760 1385 C 960 1400 1080 1360 1200 1340 L1200 1500 L0 1500 Z" fill="#101b2c"/>
+
+  <g opacity="0.14" stroke="#f8e7c8" stroke-width="2" fill="none">
+    <path d="M90 660 C 240 600 420 640 560 700"/>
+    <path d="M640 760 C 780 720 930 730 1100 690"/>
+    <path d="M280 580 C 360 540 470 540 560 570"/>
+  </g>
+  <g opacity="0.08" stroke="#ffffff" stroke-width="18" stroke-linecap="round">
+    <path d="M170 990 L170 1470"/>
+    <path d="M1020 950 L1020 1450"/>
+  </g>
+  <rect width="1200" height="1500" fill="url(#grain)"/>
+</svg>
